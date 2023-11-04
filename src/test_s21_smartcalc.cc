@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 #include "s21_smartcalc.h"
 
 TEST(CalculatorTest, BasicOperations1) {
@@ -127,7 +129,7 @@ TEST(CalculatorTest, ComplexExpressions22) {
   s21::Calculator calc;
   calc.setExpression("log(log(log(123456789)))");
   EXPECT_DOUBLE_EQ(calc.eval(), -0.041899878188837392);
-}
+}  // wolfram: 1.07 // google: -0.04
 
 TEST(CalculatorTest, ComplexExpressions23) {
   s21::Calculator calc;
@@ -206,7 +208,7 @@ TEST(CalculatorTest, ComplexExpressions30) {
   s21::Calculator calc;
   calc.setExpression("log(10000) - cos(sin(tan(0.4 + 3.2^2)) * asin(0.5))");
   EXPECT_DOUBLE_EQ(calc.eval(), 3.0256924506975276);
-}
+}  // wolfram 8.23 // google 3.02
 
 TEST(CalculatorTest, ComplexExpressions31) {
   s21::Calculator calc;
@@ -238,7 +240,7 @@ TEST(CalculatorTest, ComplexExpressions35) {
   s21::Calculator calc;
   calc.setExpression("acos(-0.5)+asin(-0.5)+atan(0.1)*cos(30)*sin(20)*tan(45)");
   EXPECT_DOUBLE_EQ(calc.eval(), 1.59353);
-}
+}  // wolfram 1.60032 // google 1.593530
 
 TEST(CalculatorTest, ComplexExpressions36) {
   s21::Calculator calc;
@@ -266,10 +268,121 @@ TEST(CalculatorTest, ComplexExpressions38) {
   EXPECT_DOUBLE_EQ(calc.eval(), 0.69777465796400795);
 }
 
+TEST(CalculatorTest, ComplexExpressions39) {
+  s21::Calculator calc;
+  calc.setExpression("ln(2^(sin(3.14) + cos(1.57)) - sqrt(4))");
+  EXPECT_TRUE(std::isnan(calc.eval()));
+}
+
+TEST(CalculatorTest, ComplexExpressions40) {
+  s21::Calculator calc;
+  calc.setExpression("cos(2^(tan(3.14) - sin(1.57)) * sqrt(16))");
+  EXPECT_DOUBLE_EQ(calc.eval(), -0.41413970498991637);
+}
+
+TEST(CalculatorTest, ComplexExpressions41) {
+  s21::Calculator calc;
+  calc.setExpression("asin(2^(sin(3.14) + cos(1.57)) / sqrt(4))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 0.52455587485994881);
+}
+
+TEST(CalculatorTest, ComplexExpressions42) {
+  s21::Calculator calc;
+  calc.setExpression("atan(2^(tan(3.14) - sin(1.57)) + sqrt(16))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.3521014222272312);
+}
+
+TEST(CalculatorTest, ComplexExpressions43) {
+  s21::Calculator calc;
+  calc.setExpression("acos(2.5 * (cos(1) - sin(0.5)) / (tan(1) + 1))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.5112509165719772);
+}
+
+TEST(CalculatorTest, ComplexExpressions45) {
+  s21::Calculator calc;
+  calc.setExpression("sin(cos(tan(1.5^2 - sqrt(16) / ln(10))) * acos(0.7))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 0.62302621558935645);
+}
+
+TEST(CalculatorTest, ComplexExpressions46) {
+  s21::Calculator calc;
+  calc.setExpression("sqrt(2^(cos(1.2) - sin(0.8)) * tan(3.6 / sqrt(9)))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.4181289045281718);
+}
+
+TEST(CalculatorTest, ComplexExpressions47) {
+  s21::Calculator calc;
+  calc.setExpression("cos(2.5 + sin(1.2 * tan(0.8 / sqrt(9))) * 3^(ln(2)))");
+  EXPECT_DOUBLE_EQ(calc.eval(), -0.99885315255329443);
+}
+
+TEST(CalculatorTest, ComplexExpressions48) {
+  s21::Calculator calc;
+  calc.setExpression("log(2^(sin(1.5) + cos(2.5)) / (tan(0.7) + ln(1.2)))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 0.048549088779287458);
+}  // wolfram 0.111788 // google 0.04854
+
+TEST(CalculatorTest, ComplexExpressions49) {
+  s21::Calculator calc;
+  calc.setExpression("2 + (3 - (4 * (5 / (6 + (7 - (8 * (9 / (10 ^ 2))))))))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 3.3713355048859937);
+}
+
+TEST(CalculatorTest, ComplexExpressions50) {
+  s21::Calculator calc;
+  calc.setExpression(
+      "1 + (2 - (3 * (4 / (5 + (6 - (7 * (8 / (9 ^ (10 + (11 - (12 * (13 / (14 "
+      "+ (15 - (16 * (17 / (18 ^ 19)))))))))))))))))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.9090909090909023);
+}
+
+TEST(CalculatorTest, ComplexExpressions51) {
+  s21::Calculator calc;
+  calc.setExpression(
+      "1 + (2 - (3 * (4 / (5 + (6 - (7 * (8 / (9 ^ (10 + (11 - (12 * (13 / (14 "
+      "+ (15 - (16 * (17 / (18 ^ (19 + (20 - (21 * (22 / (23 ^ "
+      "24))))))))))))))))))))))");
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.9090909090909023);
+}
+
+TEST(CalculatorTest, ComplexExpressions52) {
+  s21::Calculator calc;
+  calc.setExpression(
+      "2 ^ (3 ^ (4 ^ (5 ^ (6 ^ (7 ^ (8 ^ (9 ^ (10 ^ (11 ^ (12 ^ 13))))))))))");
+  EXPECT_TRUE(std::isinf(calc.eval()));
+}
+
+TEST(CalculatorTest, ComplexExpressions53) {
+  s21::Calculator calc;
+  calc.setExpression(
+      "sin(2) + (cos(3) - (tan(4) * (acos(5) + (asin(6) - (atan(7) * (cos(8) + "
+      "(sin(9) ^ (tan(10) + (acos(11) - (asin(12) * (atan(13) / (cos(14) + "
+      "(sin(15) - (tan(16) * (acos(17) / (sin(18) ^ (cos(19) + (tan(20) - "
+      "(asin(21) * (atan(22) / (cos(23) + (sin(24) - (tan(25) * (acos(26) / "
+      "(sin(27) ^ (cos(28) + (tan(29) - (asin(30) * (atan(31) / (cos(32) + "
+      "(sin(33) - (tan(34) * (acos(35) / (sin(36) ^ (cos(37) + (tan(38) - "
+      "(asin(39) * (atan(40) / (cos(41) + (sin(42) - (tan(43) * (acos(44) / "
+      "(sin(45) ^ (cos(46) + (tan(47) - (asin(48) * (atan(49) / (cos(50) + "
+      "(sin(51) - (tan(52) * (acos(53) / (sin(54) ^ (cos(55) + (tan(56) - "
+      "(asin(57) * (atan(58) / (cos(59) + (sin(60) - (tan(61) * (acos(62) / "
+      "(sin(63) ^ (cos(64) + (tan(65) - (asin(66) * (atan(67) / (cos(68) + "
+      "(sin(69) - (tan(70) * (acos(71) / (sin(72) ^ (cos(73) + (tan(74) - "
+      "(asin(75) * (atan(76) / (cos(77) + (sin(78) - (tan(79) * (acos(80) / "
+      "(sin(81) ^ (cos(82) + (tan(83) - (asin(84) * (atan(85) / (cos(86) + "
+      "(sin(87) - (tan(88) * (acos(89) / (sin(90) ^ (cos(91) + (tan(92) - "
+      "(asin(93) * (atan(94) / (cos(95) + (sin(96) - (tan(97) * (acos(98) / "
+      "(sin(99) ^ "
+      "(cos(100))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))"
+      ")))))))))))))))))))))))))))))))))))");
+  EXPECT_TRUE(std::isnan(calc.eval()));
+}
+
+TEST(CalculatorTest, ComplexExpressions54) {
+  s21::Calculator calc("x^x^x^x", 2);
+  EXPECT_EQ(calc.eval(), 65536);
+}
+
 int main(int argc, char** argv) {
-  double result =
-      acos(-0.5) + asin(-0.5) + atan(0.1) * cos(30) * sin(20) * tan(45);
-  std::cout << "Результат: " << result << std::endl;
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

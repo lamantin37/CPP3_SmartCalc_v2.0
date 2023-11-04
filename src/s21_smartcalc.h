@@ -14,26 +14,39 @@ namespace s21 {
 class Calculator {
  public:
   Calculator() = default;
+  Calculator(std::string str, const double x) : expression(str), variable(x) {}
   Calculator(std::string str) : expression(str) {}
   ~Calculator() {}
 
   void parse_args() {
     size_t index = 0;
+    // bool unary = true;
     while (index < expression.size()) {
       auto operand = std::find_if(
           operands_map.begin(), operands_map.end(), [&](const auto& op) {
             return expression.compare(index, op.first.size(), op.first) == 0;
           });
       if (operand != operands_map.end()) {
+        
+        // if (unary && operand->first != "(" && operand->first != ")") {
+        //   ++index;
+        //   continue;
+        // }
+
         tmp_mixed_lexeme_list.push_back(operand->first);
         index += operand->first.size();
+        // unary = true;
+
+
       } else if (isdigit(expression[index])) {
         std::size_t num_end;
         tmp_mixed_lexeme_list.push_back(
             stod(expression.substr(index), &num_end));
         index += num_end;
+        // unary = false;
       } else if (isalpha(expression[index])) {
         tmp_mixed_lexeme_list.push_back(std::string(1, expression[index++]));
+        // unary = false;
       } else {
         ++index;
       }
@@ -57,6 +70,10 @@ class Calculator {
           throw std::invalid_argument("bad ')'");
         operators_stack.pop_back();
       } else {
+        if (operands_map.find(*op) == operands_map.end()) {
+          value_stack.push_back(variable);
+          continue;
+        }
         int priority = operands_map[*op];
         while (!operators_stack.empty() &&
                operands_map[operators_stack.back()] > priority)
@@ -78,6 +95,10 @@ class Calculator {
     for (const auto& item : tmp_mixed_lexeme_list) {
       if (std::holds_alternative<std::string>(item)) {
         const auto& op = std::get<std::string>(item);
+        if (function_map.find(op) == function_map.end()) {
+          values.push_back(variable);
+          continue;
+        }
         auto& f = function_map[op];
         if (std::holds_alternative<std::function<double(double)>>(f)) {
           if (values.empty()) throw std::invalid_argument("something wrong 1");
@@ -110,6 +131,7 @@ class Calculator {
 
  private:
   std::string expression;
+  const double variable{};
   std::unordered_map<std::string, int> operands_map = {
       {"cos", 5},  {"sin", 5},  {"tan", 5}, {"acos", 5}, {"asin", 5},
       {"atan", 5}, {"sqrt", 5}, {"ln", 5},  {"log", 5},  {"mod", 5},
