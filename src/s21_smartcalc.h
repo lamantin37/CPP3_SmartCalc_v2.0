@@ -27,7 +27,6 @@ class Calculator {
             return expression.compare(index, op.first.size(), op.first) == 0;
           });
       if (operand != operands_map.end()) {
-        
         // if (unary && operand->first != "(" && operand->first != ")") {
         //   ++index;
         //   continue;
@@ -36,7 +35,6 @@ class Calculator {
         tmp_mixed_lexeme_list.push_back(operand->first);
         index += operand->first.size();
         // unary = true;
-
 
       } else if (isdigit(expression[index])) {
         std::size_t num_end;
@@ -71,7 +69,7 @@ class Calculator {
         operators_stack.pop_back();
       } else {
         if (operands_map.find(*op) == operands_map.end()) {
-          value_stack.push_back(variable);
+          value_stack.push_back("x");
           continue;
         }
         int priority = operands_map[*op];
@@ -122,6 +120,28 @@ class Calculator {
   }
 
   void setExpression(std::string str) { expression = str; }
+  void setVariable(double var) { variable = var; }
+  void clear() { tmp_mixed_lexeme_list.clear(); }
+
+  double PMT_anu(double P, double r, int n) {
+    return ((r/1200) * pow((1 + (r/1200)), n) / (pow((1 + (r/1200)), n) - 1)) * P;
+  }
+  double Total_Interest_Paid_anu(double P, double r, int n) {
+    return (Total_Loan_Amount_anu(P, r, n) - P);
+  }
+  double Total_Loan_Amount_anu(double P, double r, int n) {
+    return (PMT_anu(P, r, n) * n);
+  }
+
+  double PMT_diff(double P, double r, int n) {
+    return (Total_Loan_Amount_diff(P, r, n) / n);
+  }
+  double Total_Interest_Paid_diff(double P, double r, int n) {
+    return ((P * (r / 1200) * (n + 1)) / 2);
+  }
+  double Total_Loan_Amount_diff(double P, double r, int n) {
+    return (P + Total_Interest_Paid_diff(P, r, n));
+  }
 
   double eval() {
     parse_args();
@@ -131,7 +151,7 @@ class Calculator {
 
  private:
   std::string expression;
-  const double variable{};
+  double variable{};
   std::unordered_map<std::string, int> operands_map = {
       {"cos", 5},  {"sin", 5},  {"tan", 5}, {"acos", 5}, {"asin", 5},
       {"atan", 5}, {"sqrt", 5}, {"ln", 5},  {"log", 5},  {"mod", 5},
