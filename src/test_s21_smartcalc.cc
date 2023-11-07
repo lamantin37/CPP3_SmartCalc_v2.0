@@ -239,7 +239,7 @@ TEST(CalculatorTest, ComplexExpressions34) {
 TEST(CalculatorTest, ComplexExpressions35) {
   s21::Calculator calc;
   calc.setExpression("acos(-0.5)+asin(-0.5)+atan(0.1)*cos(30)*sin(20)*tan(45)");
-  EXPECT_DOUBLE_EQ(calc.eval(), 1.59353);
+  EXPECT_DOUBLE_EQ(calc.eval(), 1.5935309268233344);
 }  // wolfram 1.60032 // google 1.593530
 
 TEST(CalculatorTest, ComplexExpressions36) {
@@ -380,6 +380,26 @@ TEST(CalculatorTest, ComplexExpressions53) {
 TEST(CalculatorTest, ComplexExpressions54) {
   s21::Calculator calc("x^x^x^x", 2);
   EXPECT_EQ(calc.eval(), 65536);
+}
+
+TEST(CalculatorTest, ComplexExpressions55) {
+  s21::Calculator calc("-5");
+  EXPECT_EQ(calc.eval(), -5);
+}
+
+TEST(CalculatorTest, ComplexExpressions56) {
+  s21::Calculator calc("-x", 5);
+  EXPECT_EQ(calc.eval(), -5);
+}
+
+TEST(CalculatorTest, ComplexExpressions57) {
+  s21::Calculator calc("-7 + 7 + 100");
+  EXPECT_EQ(calc.eval(), 100);
+}
+
+TEST(CalculatorTest, ComplexExpressions58) {
+  s21::Calculator calc("7 + (-7) + 100");
+  EXPECT_EQ(calc.eval(), 100);
 }
 
 int main(int argc, char** argv) {

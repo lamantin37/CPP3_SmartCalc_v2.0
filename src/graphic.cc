@@ -95,7 +95,6 @@ class CalculatorWindow : public Gtk::Window {
 
     button_calculate->signal_clicked().connect([this]() {
       std::string expression = entry->get_text();
-      std::cout << expression << std::endl;
       controller.clear_buffer();
       controller.setStr(expression);
       calculation_requested = true;
@@ -397,7 +396,7 @@ class LoanWindow : public Gtk::Window {
 class DisplayDepositInfo : public Gtk::Window {
  public:
   DisplayDepositInfo(double PMT, double Total_Interest_Paid,
-                  double Total_Loan_Amount) {
+                     double Total_Loan_Amount) {
     set_default_size(425, 240);
     set_resizable(false);
     set_title("Deposit Info");
