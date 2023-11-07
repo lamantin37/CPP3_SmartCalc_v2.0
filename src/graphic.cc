@@ -205,30 +205,36 @@ class CalculatorWindow : public Gtk::Window {
           cr->stroke();
 
           controller.parse();
-          controller.sort();
-          if (calculation_requested) {
-            double y_prev = 0.f;
-            for (double x = x_min; x < x_max; x += step) {
-              controller.setVar(x);
-              double result = controller.count();
+          try {
+            controller.sort();
+            if (calculation_requested) {
+              double y_prev = 0.f;
+              for (double x = x_min; x < x_max; x += step) {
+                controller.setVar(x);
+                try {
+                  double result = controller.count();
 
-              if (!std::isinf(result) && !std::isnan(result)) {
-                double x_fixed = (x - x_min) * (width / (x_max - x_min));
-                double y_fixed =
-                    height - (result - y_min) * (height / (y_max - y_min));
-                if ((y_prev >= y_max && y_fixed <= y_min) ||
-                    (y_prev <= y_min && y_fixed >= y_max)) {
-                  cr->stroke();
-                } else {
-                  cr->line_to(x_fixed, y_fixed);
+                  if (!std::isinf(result) && !std::isnan(result)) {
+                    double x_fixed = (x - x_min) * (width / (x_max - x_min));
+                    double y_fixed =
+                        height - (result - y_min) * (height / (y_max - y_min));
+                    if ((y_prev >= y_max && y_fixed <= y_min) ||
+                        (y_prev <= y_min && y_fixed >= y_max)) {
+                      cr->stroke();
+                    } else {
+                      cr->line_to(x_fixed, y_fixed);
+                    }
+                    y_prev = y_fixed;
+                  }
+                } catch (const std::exception &ex) {
                 }
-                y_prev = y_fixed;
               }
+
+              cr->stroke();
+
+              calculation_requested = false;
             }
-
-            cr->stroke();
-
-            calculation_requested = false;
+          } catch (const std::exception &ex) {
           }
 
           return true;
@@ -510,11 +516,12 @@ class DepositWindow : public Gtk::Window {
       std::string compound_option = combo_compound->get_active_text();
       double input_withdraw = input_with->get_value();
 
-      double earned_interest = CalculateEarnedInterest(principal, interest_rate,
-                                                       term, compound_option);
-      double tax_amount = CalculateTax(earned_interest, tax_rate);
-      double total_amount = CalculateTotalAmount(principal, earned_interest,
-                                                 tax_amount, input_withdraw);
+      double earned_interest = controller.CalculateEarnedInterest(
+          principal, interest_rate, term, input_withdraw, compound_option);
+      double tax_amount = controller.CalculateTax(earned_interest, tax_rate);
+      double total_amount = controller.CalculateTotalAmount(
+          principal, earned_interest, tax_amount, input_withdraw);
+
       DisplayDepositInfo *info_window =
           new DisplayDepositInfo(earned_interest, tax_amount, total_amount);
     });
@@ -536,31 +543,7 @@ class DepositWindow : public Gtk::Window {
   Gtk::SpinButton *spin_tax_rate;
   Gtk::ComboBoxText *combo_compound;
   Gtk::SpinButton *input_with;
-
-  double CalculateEarnedInterest(double principal, double interest_rate,
-                                 int term, const std::string &compound_option) {
-    double interest_rate_decimal = interest_rate / 100.0;
-    if (compound_option == "annually") {
-      return principal * (pow(1 + interest_rate_decimal, term / 12) - 1);
-    } else if (compound_option == "quarterly") {
-      double quarterly_rate = interest_rate_decimal / 4;
-      return principal * (pow(1 + quarterly_rate, term / 4) - 1);
-    } else if (compound_option == "monthly") {
-      double monthly_rate = interest_rate_decimal / 12;
-      return principal * (pow(1 + monthly_rate, term) - 1);
-    } else {
-      return principal * (pow(1 + interest_rate_decimal, term) - 1);
-    }
-  }
-
-  double CalculateTax(double earned_interest, double tax_rate) {
-    return earned_interest * (tax_rate / 100.0);
-  }
-
-  double CalculateTotalAmount(double principal, double earned_interest,
-                              double tax_amount, double input_withdraw) {
-    return principal + earned_interest - tax_amount - input_withdraw;
-  }
+  s21::Controller controller;
 };
 
 bool on_delete_event(GdkEventAny *event) { return false; }

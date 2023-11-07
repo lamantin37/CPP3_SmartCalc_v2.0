@@ -36,6 +36,20 @@ class Controller {
   double Total_Loan_Amount_diff(double P, double r, int n) {
     return calc.Total_Loan_Amount_diff(P, r, n);
   }
+  double CalculateEarnedInterest(double principal, double interest_rate,
+                                 int term, double input_output,
+                                 const std::string& compound_option) {
+    return calc.CalculateEarnedInterest(principal, interest_rate, term,
+                                        input_output, compound_option);
+  }
+  double CalculateTax(double earned_interest, double tax_rate) {
+    return calc.CalculateTax(earned_interest, tax_rate);
+  }
+  double CalculateTotalAmount(double principal, double earned_interest,
+                              double tax_amount, double input_withdraw) {
+    return CalculateTotalAmount(principal, earned_interest, tax_amount,
+                                input_withdraw);
+  }
 
  private:
   Calculator calc;

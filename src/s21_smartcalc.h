@@ -148,6 +148,35 @@ class Calculator {
     return (P + Total_Interest_Paid_diff(P, r, n));
   }
 
+  double CalculateEarnedInterest(double principal, double interest_rate,
+                                 int term, double input_output,
+                                 const std::string& compound_option) {
+    double interest_rate_decimal = interest_rate / 100.0;
+    if (compound_option == "annually") {
+      return principal *
+                 (1 + (pow(interest_rate / 100, static_cast<int>(term / 12)))) -
+             input_output;
+    } else if (compound_option == "quarterly") {
+      return principal *
+                 (1 + (pow(interest_rate / 400, static_cast<int>(term / 4)))) -
+             input_output;
+    } else if (compound_option == "monthly") {
+      return principal *
+                 (1 + (pow(interest_rate / 1200, static_cast<int>(term)))) -
+             input_output;
+    }
+    return 0;
+  }
+
+  double CalculateTax(double earned_interest, double tax_rate) {
+    return earned_interest * (tax_rate / 100.0);
+  }
+
+  double CalculateTotalAmount(double principal, double earned_interest,
+                              double tax_amount, double input_withdraw) {
+    return principal + earned_interest - tax_amount - input_withdraw;
+  }
+
   double eval() {
     parse_args();
     sort_stack();
