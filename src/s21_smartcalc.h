@@ -20,31 +20,30 @@ class Calculator {
 
   void parse_args() {
     size_t index = 0;
-    // bool unary = true;
+    int unary_multiplayer = 1;
     while (index < expression.size()) {
       auto operand = std::find_if(
           operands_map.begin(), operands_map.end(), [&](const auto& op) {
             return expression.compare(index, op.first.size(), op.first) == 0;
           });
       if (operand != operands_map.end()) {
-        // if (unary && operand->first != "(" && operand->first != ")") {
-        //   ++index;
-        //   continue;
-        // }
-
-        tmp_mixed_lexeme_list.push_back(operand->first);
+        if ((operand->first == "-" || operand->first == "+") &&
+            (index == 0 || expression[index - 1] == '(')) {
+          if (operand->first == "-") unary_multiplayer = -1;
+        } else {
+          tmp_mixed_lexeme_list.push_back(operand->first);
+        }
         index += operand->first.size();
-        // unary = true;
-
       } else if (isdigit(expression[index])) {
         std::size_t num_end;
         tmp_mixed_lexeme_list.push_back(
-            stod(expression.substr(index), &num_end));
+            stod(expression.substr(index), &num_end) * unary_multiplayer);
+        unary_multiplayer *= unary_multiplayer == -1 ? -1 : 1;
         index += num_end;
-        // unary = false;
       } else if (isalpha(expression[index])) {
-        tmp_mixed_lexeme_list.push_back(std::string(1, expression[index++]));
-        // unary = false;
+        tmp_mixed_lexeme_list.push_back(unary_multiplayer == -1 ? "-x" : "x");
+        unary_multiplayer *= unary_multiplayer == -1 ? -1 : 1;
+        ++index;
       } else {
         ++index;
       }
@@ -69,7 +68,7 @@ class Calculator {
         operators_stack.pop_back();
       } else {
         if (operands_map.find(*op) == operands_map.end()) {
-          value_stack.push_back("x");
+          value_stack.push_back(*op);
           continue;
         }
         int priority = operands_map[*op];
@@ -94,7 +93,11 @@ class Calculator {
       if (std::holds_alternative<std::string>(item)) {
         const auto& op = std::get<std::string>(item);
         if (function_map.find(op) == function_map.end()) {
-          values.push_back(variable);
+          if (op == "-x") {
+            values.push_back(variable * -1);
+          } else {
+            values.push_back(variable);
+          }
           continue;
         }
         auto& f = function_map[op];
@@ -124,7 +127,9 @@ class Calculator {
   void clear() { tmp_mixed_lexeme_list.clear(); }
 
   double PMT_anu(double P, double r, int n) {
-    return ((r/1200) * pow((1 + (r/1200)), n) / (pow((1 + (r/1200)), n) - 1)) * P;
+    return ((r / 1200) * pow((1 + (r / 1200)), n) /
+            (pow((1 + (r / 1200)), n) - 1)) *
+           P;
   }
   double Total_Interest_Paid_anu(double P, double r, int n) {
     return (Total_Loan_Amount_anu(P, r, n) - P);
